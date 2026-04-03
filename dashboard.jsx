@@ -52,55 +52,85 @@ function RevenueChart() {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
-    const w = 640, h = 280, mt = 30, mr = 50, mb = 40, ml = 50;
+    const w = 640, h = 280, mt = 30, mr = 50, mb = 60, ml = 50; // Increased bottom margin for labels
     const iw = w - ml - mr, ih = h - mt - mb;
     svg.attr("viewBox", `0 0 ${w} ${h}`);
     const g = svg.append("g").attr("transform", `translate(${ml},${mt})`);
     const x = d3.scaleBand().domain(revenueData.map(d => d.q)).range([0, iw]).padding(0.35);
     const y = d3.scaleLinear().domain([0, 500]).range([ih, 0]);
     const y2 = d3.scaleLinear().domain([55, 75]).range([ih, 0]);
-    g.selectAll(".gridline").data(y.ticks(5)).join("line").attr("class","gridline")
-      .attr("x1",0).attr("x2",iw).attr("y1",d=>y(d)).attr("y2",d=>y(d))
-      .attr("stroke","var(--color-border-tertiary)").attr("stroke-dasharray","3,3");
-    g.selectAll(".bar").data(revenueData).join("rect").attr("class","bar")
+
+    g.selectAll(".gridline").data(y.ticks(5)).join("line").attr("class", "gridline")
+      .attr("x1", 0).attr("x2", iw).attr("y1", d => y(d)).attr("y2", d => y(d))
+      .attr("stroke", "var(--color-border-tertiary)").attr("stroke-dasharray", "3,3");
+
+    g.selectAll(".bar").data(revenueData).join("rect").attr("class", "bar")
       .attr("x", d => x(d.q)).attr("y", d => y(d.rev)).attr("width", x.bandwidth())
       .attr("height", d => ih - y(d.rev)).attr("rx", 4)
-      .attr("fill", (d, i) => i === revenueData.length - 1 ? "#93B7EB" : TEAL)
+      .attr("fill", (d, i) => i === revenueData.length - 1 ? "#93B7EB" : TEAL) // Last bar is blue
       .attr("opacity", (d, i) => i === revenueData.length - 1 ? 0.7 : 1);
-    g.selectAll(".barlabel").data(revenueData).join("text").attr("class","barlabel")
-      .attr("x", d => x(d.q) + x.bandwidth()/2).attr("y", d => y(d.rev) - 6)
-      .attr("text-anchor","middle").attr("font-size","11px").attr("font-weight","500")
-      .attr("fill","var(--color-text-primary)")
+
+    g.selectAll(".barlabel").data(revenueData).join("text").attr("class", "barlabel")
+      .attr("x", d => x(d.q) + x.bandwidth() / 2).attr("y", d => y(d.rev) - 6)
+      .attr("text-anchor", "middle").attr("font-size", "11px").attr("font-weight", "500")
+      .attr("fill", "var(--color-text-primary)")
       .text(d => `$${Math.round(d.rev)}M`);
-    const line = d3.line().x(d => x(d.q) + x.bandwidth()/2).y(d => y2(d.gm)).curve(d3.curveMonotoneX);
+
+    const line = d3.line().x(d => x(d.q) + x.bandwidth() / 2).y(d => y2(d.gm)).curve(d3.curveMonotoneX);
     g.append("path").datum(revenueData).attr("d", line)
-      .attr("fill","none").attr("stroke",CORAL).attr("stroke-width",2.5).attr("stroke-dasharray", function(){ return this.getTotalLength(); }).attr("stroke-dashoffset", function(){ return this.getTotalLength(); })
+      .attr("fill", "none").attr("stroke", CORAL).attr("stroke-width", 2.5).attr("stroke-dasharray", function () { return this.getTotalLength(); }).attr("stroke-dashoffset", function () { return this.getTotalLength(); })
       .transition().duration(1500).attr("stroke-dashoffset", 0);
-    g.selectAll(".dot").data(revenueData).join("circle").attr("class","dot")
-      .attr("cx", d => x(d.q) + x.bandwidth()/2).attr("cy", d => y2(d.gm))
-      .attr("r", 4).attr("fill",CORAL).attr("stroke","var(--color-background-primary)").attr("stroke-width",2);
-    g.append("g").attr("transform",`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0)).select(".domain").remove();
-    g.selectAll(".tick text").attr("font-size","10px").attr("fill","var(--color-text-secondary)");
+
+    g.selectAll(".dot").data(revenueData).join("circle").attr("class", "dot")
+      .attr("cx", d => x(d.q) + x.bandwidth() / 2).attr("cy", d => y2(d.gm))
+      .attr("r", 4).attr("fill", CORAL).attr("stroke", "var(--color-background-primary)").attr("stroke-width", 2);
+
+    g.append("g").attr("transform", `translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0)).select(".domain").remove();
+    g.selectAll(".tick text").attr("font-size", "10px").attr("fill", "var(--color-text-secondary)");
+
     g.append("g").call(d3.axisLeft(y).ticks(5).tickFormat(d => `$${d}M`).tickSize(0)).select(".domain").remove();
-    g.selectAll(".tick text").attr("font-size","10px").attr("fill","var(--color-text-secondary)");
-    const ay2 = g.append("g").attr("transform",`translate(${iw},0)`).call(d3.axisRight(y2).ticks(4).tickFormat(d => `${d}%`).tickSize(0));
+    g.selectAll(".tick text").attr("font-size", "10px").attr("fill", "var(--color-text-secondary)");
+
+    const ay2 = g.append("g").attr("transform", `translate(${iw},0)`).call(d3.axisRight(y2).ticks(4).tickFormat(d => `${d}%`).tickSize(0));
     ay2.select(".domain").remove();
-    ay2.selectAll(".tick text").attr("font-size","10px").attr("fill",CORAL);
-    g.append("text").attr("x",iw/2).attr("y",-12).attr("text-anchor","middle").attr("font-size","13px").attr("font-weight","500").attr("fill","var(--color-text-primary)").text("Revenue & gross margin by quarter");
-    const lg = g.append("g").attr("transform",`translate(${iw/2 - 100},${ih + 28})`);
-    lg.append("rect").attr("width",10).attr("height",10).attr("rx",2).attr("fill",TEAL);
-    lg.append("text").attr("x",14).attr("y",9).attr("font-size","11px").attr("fill","var(--color-text-secondary)").text("Revenue");
-    lg.append("circle").attr("cx",90).attr("cy",5).attr("r",4).attr("fill",CORAL);
-    lg.append("text").attr("x",98).attr("y",9).attr("font-size","11px").attr("fill","var(--color-text-secondary)").text("Gross margin %");
-    const annotations = [
-        { q: "Q3 FY26", event: "OFC 2026 product launches" },
-        { q: "Q4 FY26E", event: "Q4 FY26 earnings" },
-    ];
-    g.selectAll(".annotation").data(annotations).join("text").attr("class", "annotation")
-    .attr("x", d => x(d.q) + x.bandwidth() / 2).attr("y", -10)
-    .attr("text-anchor", "middle").attr("font-size", "10px").attr("fill", CORAL)
-    .text(d => d.event);
+    ay2.selectAll(".tick text").attr("font-size", "10px").attr("fill", CORAL);
+
+    g.append("text").attr("x", iw / 2).attr("y", ih + 40) // Position below the chart
+      .attr("text-anchor", "middle").attr("font-size", "13px").attr("font-weight", "500")
+      .attr("fill", "var(--color-text-primary)").text("Revenue & gross margin by quarter");
+
+    // Add legend below the chart
+    const lg = g.append("g").attr("transform", `translate(${iw / 2 - 100},${ih + 60})`);
+
+    // Revenue label
+    lg.append("rect")
+      .attr("width", 10)
+      .attr("height", 10)
+      .attr("rx", 2)
+      .attr("fill", TEAL);
+
+    lg.append("text")
+      .attr("x", 14)
+      .attr("y", -3) 
+      .attr("font-size", "11px")
+      .attr("fill", TEAL) 
+      .text("Revenue");
+
+    // Gross margin % label
+    lg.append("circle")
+      .attr("cx", 90)
+      .attr("cy", 5)
+      .attr("r", 4)
+      .attr("fill", CORAL);
+
+    lg.append("text")
+      .attr("x", 98)
+      .attr("y", -3) 
+      .attr("font-size", "11px")
+      .attr("fill", CORAL)
+      .text("Gross margin %");
   }, []);
+
   return <svg ref={svgRef} style={{ width: "100%", height: "auto" }} />;
 }
 
@@ -159,31 +189,51 @@ function Section({ icon, title, children, defaultOpen = false }) {
 
 function TAMChart() {
   const svgRef = useRef();
+
   useEffect(() => {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
-    const w = 640, h = 280, mt = 30, mr = 50, mb = 40, ml = 50;
-    const iw = w - ml - mr, ih = h - mt - mb;
+
+    const w = 400,
+      h = 300,
+      radius = Math.min(w, h) / 2;
+
     svg.attr("viewBox", `0 0 ${w} ${h}`);
-    const g = svg.append("g").attr("transform", `translate(${ml},${mt})`);
+    const g = svg.append("g").attr("transform", `translate(${w / 2}, ${h / 2})`);
 
     const data = [
-      { label: "Networking TAM", value: 65, color: TEAL },
-      { label: "Other AI Capex", value: 585, color: GRAY },
+      { label: "Networking TAM: $65B", value: 65, color: TEAL },
+      { label: "Other AI Capex: $585B", value: 585, color: GRAY },
     ];
 
-    const pie = d3.pie().value(d => d.value)(data);
-    const arc = d3.arc().innerRadius(0).outerRadius(Math.min(iw, ih) / 2);
+    const pie = d3.pie().value((d) => d.value)(data);
+    const arc = d3.arc().innerRadius(0).outerRadius(radius);
 
-    const arcs = g.selectAll(".arc").data(pie).join("g").attr("class", "arc")
-      .attr("transform", `translate(${iw / 2},${ih / 2})`);
+    const arcs = g
+      .selectAll(".arc")
+      .data(pie)
+      .join("g")
+      .attr("class", "arc");
 
-    arcs.append("path").attr("d", arc).attr("fill", d => d.data.color);
-    arcs.append("text").attr("transform", d => `translate(${arc.centroid(d)})`)
-      .attr("text-anchor", "middle").attr("font-size", "12px").attr("fill", "white")
-      .text(d => `${d.data.label}: $${d.data.value}B`);
+    arcs
+      .append("path")
+      .attr("d", arc)
+      .attr("fill", (d) => d.data.color);
+
+    arcs
+      .append("text")
+      .attr("transform", (d) => {
+        const [x, y] = arc.centroid(d);
+        const offset = d.data.value > 100 ? -20 : 20; // Adjust text position for better visibility
+        return `translate(${x}, ${y + offset})`;
+      })
+      .attr("text-anchor", "middle")
+      .attr("font-size", "12px")
+      .attr("fill", "white")
+      .text((d) => d.data.label);
   }, []);
+
   return <svg ref={svgRef} style={{ width: "100%", height: "auto" }} />;
 }
 
@@ -213,7 +263,54 @@ export default function App() {
     <div style={{ fontFamily: "'DM Sans', sans-serif", maxWidth: 720, margin: "0 auto", padding: "0 16px 60px" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-      {/* Hero */}
+{/*
+export default function App() {
+  const [darkMode, setDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.body.classList.toggle("dark-mode", !darkMode);
+  };
+
+  return (
+    <div
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "20px",
+        backgroundColor: darkMode ? "#1e293b" : "#f8fafc",
+        color: darkMode ? "#f8fafc" : "#1e293b",
+      }}
+    >
+      <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet"
+      />
+  
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>
+          Perplexity Stock Pitch Competition
+        </h1>
+        <p style={{ fontSize: 14, color: GRAY }}>by Bala Kausik Vazrala</p>
+        <button
+          onClick={toggleDarkMode}
+          style={{
+            marginTop: 10,
+            padding: "8px 16px",
+            backgroundColor: darkMode ? "#334155" : "#e2e8f0",
+            color: darkMode ? "#f8fafc" : "#1e293b",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
+      </div>
+*/}
+
       <div style={{ padding: "40px 0 24px", borderBottom: "0.5px solid var(--color-border-tertiary)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span style={{ background: TEAL, color: "white", padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 500 }}>LONG</span>
@@ -221,7 +318,7 @@ export default function App() {
         </div>
         <h1 style={{ fontSize: 32, fontWeight: 700, margin: "0 0 6px", lineHeight: 1.2 }}>Credo Technology</h1>
         <p style={{ fontSize: 15, color: "var(--color-text-secondary)", margin: 0, lineHeight: 1.6 }}>
-          The AI data center's most critical — and most overlooked — supplier.
+          The AI data center's most critical and most overlooked supplier.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 10, marginTop: 20 }}>
@@ -240,15 +337,13 @@ export default function App() {
         </div>
       </div>
 
-      {/* Thesis */}
       <div style={{ padding: "24px 0", borderBottom: "0.5px solid var(--color-border-tertiary)" }}>
         <div style={{ fontSize: 12, fontWeight: 500, color: PURPLE, textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Investment thesis</div>
         <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.7, margin: 0 }}>
-          The market panicked over a temporary gross margin dip, sending CRDO down 59% — while missing that this is the only company making both the copper cables AND optical chips that connect every GPU in every AI data center. With 200%+ revenue growth, new products expanding TAM by 3x, and 15 of 16 analysts rating it Strong Buy at $200, this is the most asymmetric risk/reward in AI infrastructure.
+          The market panicked over a temporary gross margin dip, sending CRDO down 59% while missing that this is the only company making both the copper cables AND optical chips that connect every GPU in every AI data center. With 200%+ revenue growth, new products expanding TAM by 3x, and 15 of 16 analysts rating it Strong Buy at $200, this is the most asymmetric risk/reward in AI infrastructure.
         </p>
       </div>
 
-      {/* Expandable sections */}
       <Section icon={<BarChart3 size={18} color={TEAL} />} title="Revenue & margins" defaultOpen={true}>
         <RevenueChart />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 16 }}>
@@ -270,10 +365,10 @@ export default function App() {
         </div>
       </Section>
 
-      <Section icon={<Zap size={18} color={PURPLE} />} title="Why the market is wrong — 3 pillars">
+      <Section icon={<Zap size={18} color={PURPLE} />} title="Why the market is wrong: 3 pillars">
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {[
-            { n: 1, color: PURPLE, title: "The bottleneck has shifted from compute to connectivity", body: "AI clusters now use 100,000+ GPUs. The limiting factor isn't raw compute — it's moving data BETWEEN those GPUs fast enough. Credo invented the Active Electrical Cable (AEC): cheaper than fiber optics, uses less power, and works perfectly for the critical 3-7 meter distances inside server racks. They're the only company with both copper AND optical solutions." },
+            { n: 1, color: PURPLE, title: "The bottleneck has shifted from compute to connectivity", body: "AI clusters now use 100,000+ GPUs. The limiting factor isn't raw compute, it's moving data BETWEEN those GPUs fast enough. Credo invented the Active Electrical Cable (AEC): cheaper than fiber optics, uses less power, and works perfectly for the critical 3-7 meter distances inside server racks. They're the only company with both copper AND optical solutions." },
             { n: 2, color: TEAL, title: "The sell-off was an overreaction to a temporary margin dip", body: "On March 2, CRDO beat revenue estimates by 5.5% ($407M vs $386M) and beat EPS by 37% ($1.07 vs $0.78). The stock still dropped 18.5% in ONE DAY. Why? Q4 margin guidance was 64-66% vs Q3's 68.5%. But this is because new products (optics, gearboxes) have lower initial margins as they scale up. This is a GROWTH signal, not a warning sign. Every great semiconductor company experiences this during product transitions." },
             { n: 3, color: CORAL, title: "New products expand the addressable market by 3x", body: "At OFC 2026 (March), Credo launched: Cardinal 1.6T DSP (next-gen speed for AI fabrics), Robin 800G DSP family, and ZeroFlap Optics (eliminates micro-disruptions that can crash multi-week AI training runs). These expand Credo's TAM from ~$3B (copper AECs only) to $10B+ (copper + optical + IP licensing). A 5th hyperscaler customer is now ramping revenue." },
           ].map(p => (
@@ -285,7 +380,7 @@ export default function App() {
         </div>
       </Section>
 
-      <Section icon={<Target size={18} color={BLUE} />} title="Valuation — interactive scenario analysis">
+      <Section icon={<Target size={18} color={BLUE} />} title="Valuation: interactive scenario analysis">
         <ValuationSlider />
         <div style={{ marginTop: 16, fontSize: 13, color: GRAY, lineHeight: 1.6 }}>
           <strong>How I got these numbers:</strong> Bear case uses lowest analyst target ($125, Rosenblatt). Base case uses Vestra fair value model ($175). Bull case uses top analyst targets ($250-260, New Street Research / JP Morgan). Current median analyst consensus is $200, representing +127% upside from ~$88.
@@ -336,7 +431,7 @@ export default function App() {
           Every insight below was discovered using Perplexity Computer's agentic research. Here are the exact prompts I used and what they revealed:
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {perplexityPrompts.map((p, i) => (
+          {perplexityPrompts.slice(0, 2).map((p, i) => (
             <div key={i} style={{ padding: 14, background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)" }}>
               <div style={{ fontSize: 11, fontWeight: 500, color: CORAL, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Prompt {i + 1}</div>
               <div style={{ fontSize: 13, fontFamily: "'DM Mono', monospace", color: "var(--color-text-primary)", marginBottom: 8, lineHeight: 1.5 }}>"{p.prompt}"</div>
@@ -347,33 +442,6 @@ export default function App() {
           ))}
         </div>
       </Section>
-      <Section icon={<Cpu size={18} color={CORAL} />} title="Perplexity Computer research log">
-        <div style={{ fontSize: 13, color: GRAY, marginBottom: 14, lineHeight: 1.6 }}>
-            Every insight below was discovered using Perplexity Computer's agentic research. Here are the exact prompts I used and what they revealed:
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {perplexityPrompts.map((p, i) => (
-                <div key={i} style={{ padding: 14, background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-md)" }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: CORAL, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>Prompt {i + 1}</div>
-                    <div style={{ fontSize: 13, fontFamily: "'DM Mono', monospace", color: "var(--color-text-primary)", marginBottom: 8, lineHeight: 1.5 }}>"{p.prompt}"</div>
-                    <div style={{ fontSize: 12, color: TEAL, lineHeight: 1.5 }}>
-                        <strong>Key finding:</strong> {p.insight}
-                    </div>
-                    {/* Add links to relevant sections */}
-                    {p.prompt.includes("TAM") && (
-                    <div style={{ fontSize: 12, color: BLUE, marginTop: 6 }}>
-                        ↳ See <a href="#tam-analysis" style={{ color: BLUE, textDecoration: "underline" }}>TAM Analysis</a>
-                    </div>
-                    )}
-                    {p.prompt.includes("product") && (
-                    <div style={{ fontSize: 12, color: BLUE, marginTop: 6 }}>
-                        ↳ See <a href="#product-positioning" style={{ color: BLUE, textDecoration: "underline" }}>Product Positioning</a>
-                    </div>
-                    )}
-                </div>
-            ))}
-            </div>
-        </Section>
 
       <Section icon={<BarChart3 size={18} color={TEAL} />} title="TAM Analysis">
         <TAMChart />
@@ -386,7 +454,6 @@ export default function App() {
         <ProductPositioning />
       </Section>
 
-      {/* Footer */}
       <div style={{ marginTop: 32, padding: 20, background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-lg)", textAlign: "center" }}>
         <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Bottom line</div>
         <div style={{ fontSize: 15, lineHeight: 1.7, color: "var(--color-text-secondary)" }}>
@@ -399,3 +466,4 @@ export default function App() {
     </div>
   );
 }
+
