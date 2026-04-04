@@ -3,4 +3,4 @@ This repository includes the prompts, code, dashboard, and video intended for pu
 
 Link to the chat: https://www.perplexity.ai/computer/tasks/analyze-credo-technology-crdo-YOWnCM3oR5.PUVnl5wF8Lw?view=thread#3
 
-Link to Dashboard: [https://vercel.com/bvazralas-projects/perplexity-stock-pitch-comp/FwcUKum7g1jMiuHeiFKvLuHceA2g](https://perplexity-stock-pitch-comp-git-main-bvazralas-projects.vercel.app/)
+Link to Dashboard: https://bvazrala.github.io/perplexity_stock_pitch_comp/
