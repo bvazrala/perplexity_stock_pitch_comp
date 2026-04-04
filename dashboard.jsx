@@ -195,8 +195,8 @@ function TAMChart() {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const w = 400,
-      h = 300,
+    const w = 400, // Reduced width
+      h = 200, // Reduced height
       radius = Math.min(w, h) / 2;
 
     svg.attr("viewBox", `0 0 ${w} ${h}`);
@@ -208,7 +208,8 @@ function TAMChart() {
     ];
 
     const pie = d3.pie().value((d) => d.value)(data);
-    const arc = d3.arc().innerRadius(0).outerRadius(radius);
+    const arc = d3.arc().innerRadius(0).outerRadius(radius * 0.7); // Reduced radius for smaller chart
+    const outerArc = d3.arc().innerRadius(radius * 0.8).outerRadius(radius * 0.8);
 
     const arcs = g
       .selectAll(".arc")
@@ -216,21 +217,35 @@ function TAMChart() {
       .join("g")
       .attr("class", "arc");
 
+    // Draw pie slices
     arcs
       .append("path")
       .attr("d", arc)
       .attr("fill", (d) => d.data.color);
 
+    // Add labels outside the pie chart with arrows
+    arcs
+      .append("polyline")
+      .attr("points", (d) => {
+        const posA = arc.centroid(d); // Center of the slice
+        const posB = outerArc.centroid(d); // Just outside the slice
+        const posC = [posB[0] + (posB[0] > 0 ? 15 : -15), posB[1]]; // Position for the label
+        return [posA, posB, posC];
+      })
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", 1);
+
     arcs
       .append("text")
       .attr("transform", (d) => {
-        const [x, y] = arc.centroid(d);
-        const offset = d.data.value > 100 ? -20 : 20; // Adjust text position for better visibility
-        return `translate(${x}, ${y + offset})`;
+        const pos = outerArc.centroid(d);
+        pos[0] += pos[0] > 0 ? 25 : -25; // Offset the text to the left or right
+        return `translate(${pos})`;
       })
-      .attr("text-anchor", "middle")
+      .attr("text-anchor", (d) => (d.endAngle + d.startAngle) / 2 > Math.PI ? "end" : "start")
       .attr("font-size", "12px")
-      .attr("fill", "white")
+      .attr("fill", "black")
       .text((d) => d.data.label);
   }, []);
 
@@ -262,54 +277,16 @@ export default function App() {
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", maxWidth: 720, margin: "0 auto", padding: "0 16px 60px" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-{/*
-export default function App() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.body.classList.toggle("dark-mode", !darkMode);
-  };
-
-  return (
-    <div
-      style={{
-        fontFamily: "'DM Sans', sans-serif",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "20px",
-        backgroundColor: darkMode ? "#1e293b" : "#f8fafc",
-        color: darkMode ? "#f8fafc" : "#1e293b",
-      }}
-    >
-      <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap"
-        rel="stylesheet"
-      />
-  
-      <div style={{ textAlign: "center", marginBottom: 20 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>
-          Perplexity Stock Pitch Competition
+      
+       <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>
+          Perplexity Stock Pitch Competition Dashboard
         </h1>
-        <p style={{ fontSize: 14, color: GRAY }}>by Bala Kausik Vazrala</p>
-        <button
-          onClick={toggleDarkMode}
-          style={{
-            marginTop: 10,
-            padding: "8px 16px",
-            backgroundColor: darkMode ? "#334155" : "#e2e8f0",
-            color: darkMode ? "#f8fafc" : "#1e293b",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
+        <p style={{ fontSize: 16, color: "#64748b", margin: "8px 0" }}>
+          by Bala Kausik Vazrala
+        </p>
+        <hr style={{ border: "0.5px solid #d1d5db", marginTop: 16 }} />
       </div>
-*/}
 
       <div style={{ padding: "40px 0 24px", borderBottom: "0.5px solid var(--color-border-tertiary)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -457,7 +434,7 @@ export default function App() {
       <div style={{ marginTop: 32, padding: 20, background: "var(--color-background-secondary)", borderRadius: "var(--border-radius-lg)", textAlign: "center" }}>
         <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Bottom line</div>
         <div style={{ fontSize: 15, lineHeight: 1.7, color: "var(--color-text-secondary)" }}>
-          CRDO is the best risk/reward in AI infrastructure. You're buying 200%+ revenue growth, 68% gross margins, $1.3B net cash, and a 3x TAM expansion — at a 59% discount to its 52-week high. The margin dip that spooked the market is temporary. The growth is structural.
+          CRDO is the best risk/reward in AI infrastructure. You're buying 200%+ revenue growth, 68% gross margins, $1.3B net cash, and a 3x TAM expansion at a 59% discount to its 52-week high. The margin dip that spooked the market is temporary. The growth is structural.
         </div>
         <div style={{ marginTop: 12, fontSize: 20, fontWeight: 700, color: TEAL }}>
           BUY CRDO · Target: $175 · Upside: +99%
