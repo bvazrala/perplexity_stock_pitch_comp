@@ -4,7 +4,9 @@
   "description": "This repository includes the prompts, code, dashboard, and video intended for purposes of Perplexity Stock Pitch Competition using Perplexity Computer",
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html --public-url /perplexity_stock_pitch_comp/",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -16,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/bvazrala/perplexity_stock_pitch_comp/issues"
   },
-  "homepage": "https://github.com/bvazrala/perplexity_stock_pitch_comp#readme",
+  "homepage": "https://bvazrala.github.io/perplexity_stock_pitch_comp",
   "dependencies": {
     "d3": "^7.9.0",
     "lucide-react": "^1.7.0",
@@ -24,6 +26,7 @@
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "gh-pages": "^5.0.0",
     "parcel": "^2.16.4"
   }
 }
