@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { TrendingUp, TrendingDown, AlertTriangle, Target, Zap, Shield, Clock, ChevronDown, ChevronUp, DollarSign, Cpu, Cable, BarChart3, ArrowUpRight } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, Target, Zap, Shield, Clock, ChevronDown, ChevronUp, DollarSign, Cpu, Cable, BarChart3, ArrowUpRight, Moon, Sun } from "lucide-react";
 
 const TEAL = "#0F6E56";
 const CORAL = "#D85A30";
@@ -233,7 +233,7 @@ function TAMChart() {
         return [posA, posB, posC];
       })
       .attr("fill", "none")
-      .attr("stroke", "black")
+      .style("stroke", "var(--color-text-secondary)")
       .attr("stroke-width", 1);
 
     arcs
@@ -245,7 +245,7 @@ function TAMChart() {
       })
       .attr("text-anchor", (d) => (d.endAngle + d.startAngle) / 2 > Math.PI ? "end" : "start")
       .attr("font-size", "12px")
-      .attr("fill", "black")
+      .style("fill", "var(--color-text-primary)")
       .text((d) => d.data.label);
   }, []);
 
@@ -273,9 +273,80 @@ function ProductPositioning() {
   );
 }
 
+function DarkModeToggle({ isDark, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      style={{
+        position: "fixed",
+        top: 16,
+        right: 16,
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "5px 10px 5px 5px",
+        background: "var(--color-background-secondary)",
+        border: "1px solid var(--color-border-secondary)",
+        borderRadius: 24,
+        cursor: "pointer",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.12)",
+      }}
+    >
+      {/* Pill track */}
+      <div style={{
+        position: "relative",
+        width: 42,
+        height: 22,
+        background: isDark ? TEAL : "#94a3b8",
+        borderRadius: 11,
+        flexShrink: 0,
+        transition: "background 0.3s",
+      }}>
+        {/* Knob */}
+        <div style={{
+          position: "absolute",
+          top: 3,
+          left: isDark ? 21 : 3,
+          width: 16,
+          height: 16,
+          background: "#ffffff",
+          borderRadius: "50%",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+          transition: "left 0.25s ease",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          {isDark
+            ? <Moon size={9} color={TEAL} strokeWidth={2.5} />
+            : <Sun size={9} color="#64748b" strokeWidth={2.5} />}
+        </div>
+      </div>
+      <span style={{ fontSize: 12, fontWeight: 500, color: "var(--color-text-secondary)", userSelect: "none" }}>
+        {isDark ? "Dark" : "Light"}
+      </span>
+    </button>
+  );
+}
+
 export default function App() {
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = localStorage.getItem("theme");
+    if (saved) return saved === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
+
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", maxWidth: 720, margin: "0 auto", padding: "0 16px 60px" }}>
+      <DarkModeToggle isDark={isDark} onToggle={() => setIsDark(d => !d)} />
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
       
        <div style={{ textAlign: "center", marginBottom: 20 }}>
@@ -285,7 +356,7 @@ export default function App() {
         <p style={{ fontSize: 16, color: "#64748b", margin: "8px 0" }}>
           by Bala Kausik Vazrala
         </p>
-        <hr style={{ border: "0.5px solid #d1d5db", marginTop: 16 }} />
+        <hr style={{ border: "0.5px solid var(--color-border-tertiary)", marginTop: 16 }} />
       </div>
 
       <div style={{ padding: "40px 0 24px", borderBottom: "0.5px solid var(--color-border-tertiary)" }}>

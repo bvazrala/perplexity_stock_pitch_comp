@@ -1,14 +1,55 @@
+/* ─── CSS custom properties ─── */
+:root,
+[data-theme="light"] {
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f1f5f9;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-border-tertiary: #e2e8f0;
+  --color-border-secondary: #cbd5e1;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+[data-theme="dark"] {
+  --color-background-primary: #0f172a;
+  --color-background-secondary: #1e293b;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-border-tertiary: #334155;
+  --color-border-secondary: #475569;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+/* ─── Base ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  transition: background-color 0.3s, color 0.3s;
+  font-family: "DM Sans", Arial, sans-serif;
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-body.dark-mode {
-  background-color: #1e293b;
-  color: #f8fafc;
-}
-
-button {
-  transition: background-color 0.3s, color 0.3s;
+/* Smooth theme transitions for common elements */
+button,
+div,
+span,
+p,
+h1,
+h2,
+h3,
+svg {
+  transition: background-color 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease;
 }
