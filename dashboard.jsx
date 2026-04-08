@@ -198,76 +198,110 @@ export default function App() {
   return (
     <>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-      <div className="h-screen flex flex-col overflow-hidden"
+      <div className="flex flex-col min-h-screen md:h-screen md:overflow-hidden"
         style={{ background: "var(--color-background-primary)", color: "var(--color-text-primary)", fontFamily: "'DM Sans', sans-serif" }}>
 
         {/* ── HEADER ── */}
-        <header className="shrink-0 flex items-center gap-5 px-5 py-2 border-b"
+        <header className="shrink-0 border-b"
           style={{ borderColor: "var(--color-border-tertiary)" }}>
 
-          {/* Company identity */}
-          <div className="shrink-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ background: TEAL }}>LONG</span>
-              <span className="text-xs" style={{ color: GRAY }}>NASDAQ: CRDO</span>
-            </div>
-            <h1 className="text-lg font-bold leading-tight">Credo Technology</h1>
-            <p className="text-xs" style={{ color: GRAY }}>AI data center's most critical and overlooked supplier.</p>
-          </div>
-
-          <div className="w-px h-8 shrink-0" style={{ background: "var(--color-border-tertiary)" }} />
-
-          {/* 4 key metrics */}
-          <div className="flex items-center gap-2">
-            {[
-              { label: "Price", value: "~$88", sub: "−59% from ATH" },
-              { label: "Target", value: "$175", sub: "Base case" },
-              { label: "Mkt cap", value: "$16.2B", sub: "NASDAQ" },
-              { label: "Net cash", value: "$1.3B", sub: "Zero debt" },
-            ].map((m, i) => (
-              <div key={i} className="text-center px-3 py-1.5 rounded-lg"
-                style={{ background: "var(--color-background-secondary)" }}>
-                <div className="text-xs" style={{ color: GRAY }}>{m.label}</div>
-                <div className="text-base font-bold" style={{ fontFamily: "'DM Mono', monospace" }}>{m.value}</div>
-                <div style={{ fontSize: 10, color: GRAY }}>{m.sub}</div>
+          {/* ── Mobile header ── */}
+          <div className="flex md:hidden flex-col px-4 py-2 gap-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ background: TEAL }}>LONG</span>
+                  <span className="text-xs" style={{ color: GRAY }}>NASDAQ: CRDO</span>
+                </div>
+                <h1 className="text-base font-bold leading-tight">Credo Technology</h1>
               </div>
-            ))}
-          </div>
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* Page title (center-ish) */}
-          <div className="text-center hidden xl:block">
-            <p className="text-sm font-semibold">Perplexity Stock Pitch Competition</p>
-            <p className="text-xs" style={{ color: GRAY }}>by Bala Kausik Vazrala</p>
-          </div>
-
-          <div className="flex-1" />
-
-          {/* Dark mode toggle */}
-          <button onClick={() => setIsDark(d => !d)}
-            className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full border cursor-pointer"
-            style={{ background: "var(--color-background-secondary)", borderColor: "var(--color-border-secondary)" }}>
-            <div className="relative w-8 h-4 rounded-full transition-colors"
-              style={{ background: isDark ? TEAL : "#94a3b8" }}>
-              <div className="absolute top-0.5 w-3 h-3 bg-white rounded-full shadow flex items-center justify-center transition-all"
-                style={{ left: isDark ? "17px" : "2px" }}>
-                {isDark ? <Moon size={8} color={TEAL} strokeWidth={2.5} /> : <Sun size={8} color="#64748b" strokeWidth={2.5} />}
-              </div>
+              <button onClick={() => setIsDark(d => !d)}
+                className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full border cursor-pointer"
+                style={{ background: "var(--color-background-secondary)", borderColor: "var(--color-border-secondary)" }}>
+                <div className="relative w-8 h-4 rounded-full transition-colors"
+                  style={{ background: isDark ? TEAL : "#94a3b8" }}>
+                  <div className="absolute top-0.5 w-3 h-3 bg-white rounded-full shadow flex items-center justify-center transition-all"
+                    style={{ left: isDark ? "17px" : "2px" }}>
+                    {isDark ? <Moon size={8} color={TEAL} strokeWidth={2.5} /> : <Sun size={8} color="#64748b" strokeWidth={2.5} />}
+                  </div>
+                </div>
+              </button>
             </div>
-            <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
-              {isDark ? "Dark" : "Light"}
-            </span>
-          </button>
+            <div className="grid grid-cols-4 gap-1.5">
+              {[
+                { label: "Price", value: "~$88", sub: "−59% from ATH" },
+                { label: "Target", value: "$175", sub: "Base case" },
+                { label: "Mkt cap", value: "$16.2B", sub: "NASDAQ" },
+                { label: "Net cash", value: "$1.3B", sub: "Zero debt" },
+              ].map((m, i) => (
+                <div key={i} className="text-center px-1 py-1.5 rounded-lg"
+                  style={{ background: "var(--color-background-secondary)" }}>
+                  <div style={{ fontSize: 9, color: GRAY }}>{m.label}</div>
+                  <div className="text-sm font-bold" style={{ fontFamily: "'DM Mono', monospace" }}>{m.value}</div>
+                  <div style={{ fontSize: 9, color: GRAY }}>{m.sub}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Desktop header ── */}
+          <div className="hidden md:flex items-center gap-5 px-5 py-2">
+            <div className="shrink-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ background: TEAL }}>LONG</span>
+                <span className="text-xs" style={{ color: GRAY }}>NASDAQ: CRDO</span>
+              </div>
+              <h1 className="text-lg font-bold leading-tight">Credo Technology</h1>
+              <p className="text-xs" style={{ color: GRAY }}>AI data center's most critical and overlooked supplier.</p>
+            </div>
+
+            <div className="w-px h-8 shrink-0" style={{ background: "var(--color-border-tertiary)" }} />
+
+            <div className="flex items-center gap-2">
+              {[
+                { label: "Price", value: "~$88", sub: "−59% from ATH" },
+                { label: "Target", value: "$175", sub: "Base case" },
+                { label: "Mkt cap", value: "$16.2B", sub: "NASDAQ" },
+                { label: "Net cash", value: "$1.3B", sub: "Zero debt" },
+              ].map((m, i) => (
+                <div key={i} className="text-center px-3 py-1.5 rounded-lg"
+                  style={{ background: "var(--color-background-secondary)" }}>
+                  <div className="text-xs" style={{ color: GRAY }}>{m.label}</div>
+                  <div className="text-base font-bold" style={{ fontFamily: "'DM Mono', monospace" }}>{m.value}</div>
+                  <div style={{ fontSize: 10, color: GRAY }}>{m.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex-1" />
+            <div className="text-center hidden xl:block">
+              <p className="text-sm font-semibold">Perplexity Stock Pitch Competition</p>
+              <p className="text-xs" style={{ color: GRAY }}>by Bala Kausik Vazrala</p>
+            </div>
+            <div className="flex-1" />
+
+            <button onClick={() => setIsDark(d => !d)}
+              className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full border cursor-pointer"
+              style={{ background: "var(--color-background-secondary)", borderColor: "var(--color-border-secondary)" }}>
+              <div className="relative w-8 h-4 rounded-full transition-colors"
+                style={{ background: isDark ? TEAL : "#94a3b8" }}>
+                <div className="absolute top-0.5 w-3 h-3 bg-white rounded-full shadow flex items-center justify-center transition-all"
+                  style={{ left: isDark ? "17px" : "2px" }}>
+                  {isDark ? <Moon size={8} color={TEAL} strokeWidth={2.5} /> : <Sun size={8} color="#64748b" strokeWidth={2.5} />}
+                </div>
+              </div>
+              <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
+                {isDark ? "Dark" : "Light"}
+              </span>
+            </button>
+          </div>
         </header>
 
         {/* ── MAIN 3-COLUMN GRID ── */}
-        <main className="flex-1 overflow-hidden grid gap-3 p-3 min-h-0"
-          style={{ gridTemplateColumns: "2fr 3fr 2fr" }}>
+        <main className="main-grid flex-1 gap-3 p-3 md:min-h-0 overflow-y-auto md:overflow-hidden">
 
           {/* ── LEFT COLUMN: Thesis · Valuation · Timeline ── */}
-          <div className="flex flex-col gap-3 overflow-y-auto min-h-0">
+          <div className="flex flex-col gap-3 md:overflow-y-auto md:min-h-0">
 
             {/* Investment Thesis */}
             <div className="rounded-xl p-4 shrink-0" style={{ background: "var(--color-background-secondary)" }}>
@@ -288,7 +322,7 @@ export default function App() {
             </div>
 
             {/* Catalyst Timeline */}
-            <div className="rounded-xl p-4 flex-1 overflow-y-auto" style={{ background: "var(--color-background-secondary)" }}>
+            <div className="rounded-xl p-4 md:flex-1 md:overflow-y-auto" style={{ background: "var(--color-background-secondary)" }}>
               <div className="flex items-center gap-2 mb-3">
                 <Clock size={14} color={TEAL} />
                 <span className="text-xs font-medium" style={{ color: TEAL }}>Catalyst Timeline</span>
@@ -313,7 +347,7 @@ export default function App() {
           </div>
 
           {/* ── CENTER COLUMN: Revenue Chart · Tabs ── */}
-          <div className="flex flex-col gap-3 overflow-y-auto min-h-0">
+          <div className="flex flex-col gap-3 md:overflow-y-auto md:min-h-0">
 
             {/* Revenue Chart + stat cards */}
             <div className="rounded-xl p-4 shrink-0" style={{ background: "var(--color-background-secondary)" }}>
@@ -338,7 +372,7 @@ export default function App() {
             </div>
 
             {/* Tabbed panel: Pillars | Risks | Perplexity */}
-            <div className="rounded-xl p-4 flex-1 overflow-hidden flex flex-col" style={{ background: "var(--color-background-secondary)" }}>
+            <div className="rounded-xl p-4 md:flex-1 md:overflow-hidden flex flex-col" style={{ background: "var(--color-background-secondary)" }}>
               {/* Tab buttons */}
               <div className="flex gap-1.5 mb-3 shrink-0">
                 {[
@@ -359,8 +393,8 @@ export default function App() {
                 ))}
               </div>
 
-              {/* Tab content — scrollable */}
-              <div className="overflow-y-auto flex-1">
+              {/* Tab content — scrollable on desktop, natural height on mobile */}
+              <div className="md:overflow-y-auto md:flex-1">
                 {activeTab === "pillars" && (
                   <div className="flex flex-col gap-3">
                     {[
@@ -430,7 +464,7 @@ export default function App() {
           </div>
 
           {/* ── RIGHT COLUMN: TAM · Product · Bottom Line ── */}
-          <div className="flex flex-col gap-3 overflow-y-auto min-h-0">
+          <div className="flex flex-col gap-3 md:overflow-y-auto md:min-h-0">
 
             {/* TAM */}
             <div className="rounded-xl p-4 shrink-0" style={{ background: "var(--color-background-secondary)" }}>
@@ -468,7 +502,7 @@ export default function App() {
             </div>
 
             {/* Bottom line */}
-            <div className="rounded-xl p-5 text-center flex-1 flex flex-col justify-center"
+            <div className="rounded-xl p-5 text-center md:flex-1 flex flex-col justify-center"
               style={{ background: "var(--color-background-secondary)" }}>
               <div className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: GRAY }}>Bottom Line</div>
               <p className="text-xs leading-relaxed mb-4" style={{ color: "var(--color-text-secondary)" }}>

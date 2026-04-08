@@ -26,6 +26,21 @@
   --border-radius-lg: 12px;
 }
 
+/* ─── Responsive main grid ─── */
+.main-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .main-grid {
+    display: grid;
+    grid-template-columns: 2fr 3fr 2fr;
+    overflow: hidden;
+    min-height: 0;
+  }
+}
+
 /* ─── Base ─── */
 *,
 *::before,
